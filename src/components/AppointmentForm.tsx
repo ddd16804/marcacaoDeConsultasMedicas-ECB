@@ -1,31 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components/native';
 import { Button, Input, Text } from 'react-native-elements';
-import { Platform, View, TouchableOpacity } from 'react-native';
+import { Platform, View, TouchableOpacity, Alert } from 'react-native';
 import theme from '../styles/theme';
 import { Appointment } from '../types/appointments';
-import { Doctor } from '../types/doctors';
-
-const doctors: Doctor[] = [
-   {
-      id: '1',
-      name: 'Dr. João Silva',
-      specialty: 'Cardiologista',
-      image: 'https://mighty.tools/mockmind-api/content/human/91.jpg',
-   },
-   {
-      id: '2',
-      name: 'Dra. Maria Santos',
-      specialty: 'Dermatologista',
-      image: 'https://mighty.tools/mockmind-api/content/human/97.jpg',
-   },
-   {
-      id: '3',
-      name: 'Dr. Pedro Oliveira',
-      specialty: 'Oftalmologista',
-      image: 'https://mighty.tools/mockmind-api/content/human/79.jpg',
-   },
-];
+import { Doctor, User } from '../types/doctors';
+import { authApiService } from '../services/authApi';
+import { specialtiesApiService, Specialty } from '../services/specialtiesApi';
 
 type AppointmentFormProps = {
    onSubmit: (appointment: {
@@ -45,12 +26,77 @@ const generateTimeSlots = () => {
    return slots;
 };
 
+const timeSlots = generateTimeSlots();
+
 const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit }) => {
    const [selectedDoctor, setSelectedDoctor] = useState<string>('');
-   const [dateInput, setDateInput] = useState('');
+   const [selectedSpecialty, setSelectedSpecialty] = useState<string>('');
+   const [dateInput, setDateInput] = useState<string>('');
    const [selectedTime, setSelectedTime] = useState<string>('');
-   const [description, setDescription] = useState('');
-   const timeSlots = generateTimeSlots();
+   const [description, setDescription] = useState<string>('');
+   
+   // Estados para dados da API
+   const [doctors, setDoctors] = useState<User[]>([]);
+   const [specialties, setSpecialties] = useState<Specialty[]>([]);
+   const [loading, setLoading] = useState(true);
+
+   // Carrega dados ao montar o componente
+   useEffect(() => {
+      loadInitialData();
+   }, []);
+
+   // Carrega médicos por especialidade
+   useEffect(() => {
+      if (selectedSpecialty) {
+         loadDoctorsBySpecialty(selectedSpecialty);
+      } else {
+         loadAllDoctors();
+      }
+   }, [selectedSpecialty]);
+
+   const loadInitialData = async () => {
+      try {
+         setLoading(true);
+         const [specialtiesData, doctorsData] = await Promise.all([
+            specialtiesApiService.getAllSpecialties(),
+            authApiService.getAllDoctors(),
+         ]);
+         
+         setSpecialties(specialtiesData);
+         setDoctors(doctorsData);
+      } catch (error) {
+         console.error('Erro ao carregar dados:', error);
+         Alert.alert('Erro', 'Não foi possível carregar os dados. Tente novamente.');
+      } finally {
+         setLoading(false);
+      }
+   };
+
+   const loadDoctorsBySpecialty = async (specialty: string) => {
+      try {
+         setLoading(true);
+         const doctorsData = await authApiService.getDoctorsBySpecialty(specialty);
+         setDoctors(doctorsData);
+      } catch (error) {
+         console.error('Erro ao carregar médicos:', error);
+         Alert.alert('Erro', 'Não foi possível carregar os médicos. Tente novamente.');
+      } finally {
+         setLoading(false);
+      }
+   };
+
+   const loadAllDoctors = async () => {
+      try {
+         setLoading(true);
+         const doctorsData = await authApiService.getAllDoctors();
+         setDoctors(doctorsData);
+      } catch (error) {
+         console.error('Erro ao carregar médicos:', error);
+         Alert.alert('Erro', 'Não foi possível carregar os médicos. Tente novamente.');
+      } finally {
+         setLoading(false);
+      }
+   };
 
    const validateDate = (inputDate: string) => {
       const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
@@ -61,6 +107,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit }) => {
       const [, day, month, year] = match;
       const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
       const today = new Date();
+      today.setHours(0, 0, 0, 0);
       const maxDate = new Date(new Date().setMonth(new Date().getMonth() + 3));
 
       return date >= today && date <= maxDate;
@@ -108,13 +155,36 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit }) => {
    };
 
    const isTimeSlotAvailable = (time: string) => {
-      // Aqui você pode adicionar lógica para verificar se o horário está disponível (Faremos isto nas próximas aulas)
+      // Aqui você pode adicionar lógica para verificar se o horário está disponível
       // Por exemplo, verificar se já existe uma consulta agendada para este horário
       return true;
    };
 
+   if (loading) {
+      return (
+         <Container>
+            <Text>Carregando...</Text>
+         </Container>
+      );
+   }
+
    return (
       <Container>
+         <Title>Selecione a Especialidade</Title>
+         <SpecialtyContainer>
+            {specialties.map((specialty) => (
+               <SpecialtyButton
+                  key={specialty.id}
+                  selected={selectedSpecialty === specialty.name}
+                  onPress={() => setSelectedSpecialty(specialty.name)}
+               >
+                  <SpecialtyText selected={selectedSpecialty === specialty.name}>
+                     {specialty.name}
+                  </SpecialtyText>
+               </SpecialtyButton>
+            ))}
+         </SpecialtyContainer>
+
          <Title>Selecione o Médico</Title>
          <DoctorList>
             {doctors.map((doctor) => (
@@ -140,7 +210,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit }) => {
             keyboardType="numeric"
             maxLength={10}
             containerStyle={InputContainer}
-            errorMessage={dateInput && !validateDate(dateInput) ? 'Data inválida' : undefined}
+            errorMessage={dateInput && !validateDate(dateInput) ? 'Data inválida (use DD/MM/AAAA e até 3 meses no futuro)' : undefined}
          />
 
          <TimeSlotsContainer>
@@ -182,6 +252,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit }) => {
                padding: 12,
                marginTop: 20,
             }}
+            disabled={loading}
          />
       </Container>
    );
@@ -198,6 +269,28 @@ const Title = styled.Text`
   margin-bottom: ${theme.spacing.medium}px;
 `;
 
+const SpecialtyContainer = styled.View`
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: ${theme.spacing.small}px;
+  margin-bottom: ${theme.spacing.medium}px;
+`;
+
+const SpecialtyButton = styled(TouchableOpacity)<{ selected: boolean }>`
+  padding: ${theme.spacing.small}px ${theme.spacing.medium}px;
+  background-color: ${(props) => 
+    props.selected ? theme.colors.primary : theme.colors.white};
+  border-radius: 20px;
+  border-width: 1px;
+  border-color: ${(props) => 
+    props.selected ? theme.colors.primary : theme.colors.text};
+`;
+
+const SpecialtyText = styled.Text<{ selected: boolean }>`
+  font-size: ${theme.typography.body.fontSize}px;
+  color: ${(props) => props.selected ? theme.colors.white : theme.colors.text};
+`;
+
 const DoctorList = styled.ScrollView`
   margin-bottom: ${theme.spacing.large}px;
 `;
@@ -206,7 +299,7 @@ const DoctorCard = styled(TouchableOpacity)<{ selected: boolean }>`
   flex-direction: row;
   align-items: center;
   padding: ${theme.spacing.medium}px;
-  background-color: ${(props: { selected: boolean }) => props.selected ? theme.colors.primary : theme.colors.white};
+  background-color: ${(props) => props.selected ? theme.colors.primary : theme.colors.white};
   border-radius: 8px;
   margin-bottom: ${theme.spacing.medium}px;
   elevation: 2;
@@ -256,7 +349,7 @@ const TimeSlotsGrid = styled.View`
 `;
 
 const TimeSlotButton = styled(TouchableOpacity)<{ selected: boolean; disabled: boolean }>`
-  background-color: ${(props: { selected: boolean; disabled: boolean }) => 
+  background-color: ${(props) => 
     props.disabled 
       ? theme.colors.background 
       : props.selected 
@@ -265,18 +358,18 @@ const TimeSlotButton = styled(TouchableOpacity)<{ selected: boolean; disabled: b
   padding: ${theme.spacing.small}px ${theme.spacing.medium}px;
   border-radius: 8px;
   border-width: 1px;
-  border-color: ${(props: { selected: boolean; disabled: boolean }) => 
+  border-color: ${(props) => 
     props.disabled 
       ? theme.colors.background 
       : props.selected 
         ? theme.colors.primary 
         : theme.colors.text};
-  opacity: ${(props: { disabled: boolean }) => props.disabled ? 0.5 : 1};
+  opacity: ${(props) => props.disabled ? 0.5 : 1};
 `;
 
 const TimeSlotText = styled(Text)<{ selected: boolean; disabled: boolean }>`
   font-size: ${theme.typography.body.fontSize}px;
-  color: ${(props: { selected: boolean; disabled: boolean }) => 
+  color: ${(props) => 
     props.disabled 
       ? theme.colors.text 
       : props.selected 
