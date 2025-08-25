@@ -196,7 +196,11 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit }) => {
                   <DoctorImage source={{ uri: doctor.image }} />
                   <DoctorInfo>
                      <DoctorName>{doctor.name}</DoctorName>
-                     <DoctorSpecialty>{doctor.specialty}</DoctorSpecialty>
+                     <DoctorSpecialty>
+                        {doctor.role === 'doctor' && 'specialty' in doctor 
+                           ? doctor.specialty 
+                           : 'Especialidade não informada'}
+                     </DoctorSpecialty>
                   </DoctorInfo>
                </DoctorCard>
             ))}

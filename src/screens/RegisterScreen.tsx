@@ -18,37 +18,52 @@ const RegisterScreen: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [userType, setUserType] = useState<'PACIENTE' | 'ADMIN'>('PACIENTE');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const handleRegister = async () => {
-    try {
-      setLoading(true);
-      setError('');
+  try {
+    setLoading(true);
+    setError('');
 
-      if (!name || !email || !password) {
-        setError('Por favor, preencha todos os campos');
-        return;
-      }
-
-      await register({
-        name,
-        email,
-        password,
-      });
-
-      // Após o registro bem-sucedido, navega para o login
-      navigation.navigate('Login');
-    } catch (err) {
-      setError('Erro ao criar conta. Tente novamente.');
-    } finally {
-      setLoading(false);
+    if (!name || !email || !password) {
+      setError('Por favor, preencha todos os campos');
+      return;
     }
-  };
+
+    console.log('📤 Dados sendo enviados:', { 
+      name, 
+      email, 
+      password, 
+      userType 
+    });
+
+    const result = await register({
+      name,
+      email,
+      password,
+      userType,
+    });
+
+    console.log('✅ Registro bem-sucedido:', result);
+    navigation.navigate('Login');
+    
+  } catch (err) {
+    console.error('❌ Erro detalhado no registro:', err);
+    console.error('📌 Tipo do erro:', typeof err);
+    console.error('🔍 Mensagem do erro:', err.message);
+    console.error('📊 Response completa:', err.response);
+    
+    setError('Erro ao criar conta. Tente novamente.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <Container>
-      <Title>Cadastro de Paciente</Title>
+      <Title>Cadastro de Usuário</Title>
       
       <Input
         placeholder="Nome completo"
@@ -74,6 +89,27 @@ const RegisterScreen: React.FC = () => {
         secureTextEntry
         containerStyle={styles.input}
       />
+
+      <SectionTitle>Tipo de Usuário</SectionTitle>
+      <UserTypeContainer>
+        <UserTypeButton 
+          selected={userType === 'PACIENTE'}
+          onPress={() => setUserType('PACIENTE')}
+        >
+          <UserTypeText selected={userType === 'PACIENTE'}>
+            Paciente
+          </UserTypeText>
+        </UserTypeButton>
+        
+        <UserTypeButton 
+          selected={userType === 'ADMIN'}
+          onPress={() => setUserType('ADMIN')}
+        >
+          <UserTypeText selected={userType === 'ADMIN'}>
+            Administrador
+          </UserTypeText>
+        </UserTypeButton>
+      </UserTypeContainer>
 
       {error ? <ErrorText>{error}</ErrorText> : null}
 
@@ -132,10 +168,40 @@ const Title = styled.Text`
   color: ${theme.colors.text};
 `;
 
+const SectionTitle = styled.Text`
+  font-size: 18px;
+  font-weight: bold;
+  color: ${theme.colors.text};
+  margin-bottom: 15px;
+  margin-top: 10px;
+`;
+
+const UserTypeContainer = styled.View`
+  flex-direction: row;
+  background-color: ${theme.colors.surface};
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border: 1px solid ${theme.colors.border};
+`;
+
+const UserTypeButton = styled.TouchableOpacity<{ selected: boolean }>`
+  flex: 1;
+  padding: 12px;
+  align-items: center;
+  background-color: ${props => props.selected ? theme.colors.primary : 'transparent'};
+  border-radius: 8px;
+`;
+
+const UserTypeText = styled.Text<{ selected: boolean }>`
+  color: ${props => props.selected ? '#fff' : theme.colors.text};
+  font-weight: ${props => props.selected ? 'bold' : 'normal'};
+  font-size: 16px;
+`;
+
 const ErrorText = styled.Text`
   color: ${theme.colors.error};
   text-align: center;
   margin-bottom: 10px;
 `;
 
-export default RegisterScreen;  
+export default RegisterScreen;

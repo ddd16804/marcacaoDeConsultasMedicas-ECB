@@ -15,6 +15,7 @@ export const API_ENDPOINTS = {
   // Usuários
   USERS: '/usuarios',
   DOCTORS: '/usuarios/medicos',
+  CHANGE_PASSWORD: '/usuarios',  // NOVO ENDPOINT
   
   // Especialidades
   SPECIALTIES: '/especialidades',
@@ -78,7 +79,53 @@ export class ApiClient {
     return response.json();
   }
 
-  // ... métodos PUT e DELETE similares
+  async put<T>(endpoint: string, data?: any): Promise<T> {
+    const response = await fetch(`${this.baseURL}${endpoint}`, {
+      method: 'PUT',
+      headers: this.getHeaders(),
+      body: data ? JSON.stringify(data) : undefined,
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`HTTP Error: ${response.status} - ${errorText}`);
+    }
+
+    return response.json();
+  }
+
+  async delete<T>(endpoint: string): Promise<T> {
+    const response = await fetch(`${this.baseURL}${endpoint}`, {
+      method: 'DELETE',
+      headers: this.getHeaders(),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`HTTP Error: ${response.status} - ${errorText}`);
+    }
+
+    return response.json();
+  }
+
+  // Método específico para mudança de senha
+  async changePassword(userId: string, currentPassword: string, newPassword: string): Promise<void> {
+    const data = {
+      senhaAtual: currentPassword,
+      novaSenha: newPassword
+    };
+
+    const response = await fetch(`${this.baseURL}${API_ENDPOINTS.CHANGE_PASSWORD}/${userId}/senha`, {
+      method: 'PUT',
+      headers: this.getHeaders(),
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`HTTP Error: ${response.status} - ${errorText}`);
+    }
+  }
 }
 
 // Instância global do cliente da API

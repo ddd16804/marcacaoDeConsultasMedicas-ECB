@@ -10,30 +10,7 @@ const STORAGE_KEYS = {
 
 // Médicos mockados que podem fazer login
 const mockDoctors = [
-  {
-    id: '1',
-    name: 'Dr. João Silva',
-    email: 'joao@example.com',
-    role: 'doctor' as const,
-    specialty: 'Cardiologia',
-    image: 'https://randomuser.me/api/portraits/men/1.jpg',
-  },
-  {
-    id: '2',
-    name: 'Dra. Maria Santos',
-    email: 'maria@example.com',
-    role: 'doctor' as const,
-    specialty: 'Pediatria',
-    image: 'https://randomuser.me/api/portraits/women/1.jpg',
-  },
-  {
-    id: '3',
-    name: 'Dr. Pedro Oliveira',
-    email: 'pedro@example.com',
-    role: 'doctor' as const,
-    specialty: 'Ortopedia',
-    image: 'https://randomuser.me/api/portraits/men/2.jpg',
-  },
+
 ];
 
 // Admin mockado
@@ -148,7 +125,7 @@ export const authService = {
   },
 
   async getAllDoctors(): Promise<User[]> {
-    return mockDoctors;
+    return [];
   },
 
   async getPatients(): Promise<User[]> {
