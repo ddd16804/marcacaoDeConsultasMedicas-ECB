@@ -8,9 +8,9 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useFocusEffect } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigation';
 import theme from '../styles/theme';
-import Header from '../components/Header';
+import Header from './HomeScreen/components/Header';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import UserManagement from '../components/UserManagement';
+import UserManagement from './HomeScreen/components/UserManagement';
 
 type AdminDashboardScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'AdminDashboard'>;

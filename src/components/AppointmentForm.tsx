@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components/native';
 import { Button, Input, Text } from 'react-native-elements';
 import { Platform, View, TouchableOpacity, Alert } from 'react-native';
-import theme from '../styles/theme';
-import { Appointment } from '../types/appointments';
-import { Doctor, User } from '../types/doctors';
-import { authApiService } from '../services/authApi';
-import { specialtiesApiService, Specialty } from '../services/specialtiesApi';
+import theme from '../../../styles/theme';
+import { Appointment } from '../../../types/appointments';
+import { Doctor, User } from '../../../types/doctors';
+import { authApiService } from '../../../services/authApi';
+import { specialtiesApiService, Specialty } from '../../../services/specialtiesApi';
 
 type AppointmentFormProps = {
    onSubmit: (appointment: {

@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components/native';
 import { ViewStyle, TextStyle, Alert } from 'react-native';
 import { Button, Input, Text } from 'react-native-elements';
-import { adminApiService, AdminUser, ChangePasswordData } from '../services/adminApi';
-import theme from '../styles/theme';
+import { adminApiService, AdminUser, ChangePasswordData } from '../../../services/adminApi';
+import theme from '../../../styles/theme';
 
 interface UserManagementProps {
   style?: ViewStyle;
