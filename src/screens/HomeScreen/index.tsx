@@ -4,13 +4,13 @@ import { Button } from 'react-native-elements';
 import { FontAwesome } from '@expo/vector-icons';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-import Header from '../../../components/Header';
+import Header from '../../components/Header';
 import AppointmentCard from './components/AppointmentCard';
 import EmptyState from './components/EmptyState';
 import { useHomeScreen } from './hooks/useHomeScreen';
-import { RootStackParamList } from '../../../types/navigation';
-import { Appointment } from '../../../types/appointments';
-import theme from '../../../styles/theme';
+import { RootStackParamList } from '../../types/navigation';
+import { Appointment } from '../../types/appointments';
+import theme from '../../styles/theme';
 import { Container, Content, AppointmentList } from './styles';
 
 type HomeScreenProps = {

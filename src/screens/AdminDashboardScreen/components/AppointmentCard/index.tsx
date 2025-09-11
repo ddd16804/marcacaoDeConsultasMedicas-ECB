@@ -1,8 +1,14 @@
 import React from 'react';
 import { Alert } from 'react-native';
 import { ListItem } from 'react-native-elements';
-
-import { Appointment } from '../../../../types/navigation';
+export interface Appointment {
+  id: string;
+  doctorName: string;
+  specialty: string;
+  date: string;
+  time: string;
+  status: AppointmentStatus;
+}
 import { AppointmentStatus, canUpdateStatus, formatDate } from '../../utils/statusHelpers';
 import {
   Container,

@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components/native';
 import { Avatar } from 'react-native-elements';
-import { useAuth } from '../../../contexts/AuthContext';
-import theme from '../../../styles/theme';
+import { useAuth } from '../contexts/AuthContext';
+import theme from '../styles/theme';
 
 export const HeaderContainer = styled.View`
   background-color: ${theme.colors.background};

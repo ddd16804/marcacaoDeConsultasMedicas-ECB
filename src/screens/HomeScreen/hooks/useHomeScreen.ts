@@ -1,8 +1,8 @@
 import { useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { authApiService } from '../../../../services/authApi';
-import { useAppointments } from '../../../../hooks/useAppointments';
-import { User } from '../../../../types/auth';
+import { authApiService } from '../../../services/authApi';
+import { useAppointments } from '../../../hooks/useAppointments';
+import { User } from '../../../types/auth';
 
 export const useHomeScreen = () => {
   const { appointments, loading: loadingAppointments, error: appointmentsError, loadAppointments } = useAppointments();

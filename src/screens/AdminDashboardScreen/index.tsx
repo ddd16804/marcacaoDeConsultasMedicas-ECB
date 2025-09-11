@@ -7,7 +7,7 @@ import { TabNavigation } from './components/TabNavigation';
 import { StatsCard } from './components/StatsCard';
 import { AppointmentCard } from './components/AppointmentCard';
 import { EmptyState } from './components/EmptyState';
-import Header from '../HomeScreen/components/Header';
+import Header from '../../components/Header';
 import theme from '../../styles/theme';
 import { 
   Container, 

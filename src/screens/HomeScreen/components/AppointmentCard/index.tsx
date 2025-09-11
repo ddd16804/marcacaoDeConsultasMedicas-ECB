@@ -2,8 +2,8 @@ import React from 'react';
 import { TouchableOpacity } from 'react-native';
 import { Icon } from 'react-native-elements';
 
-import { Appointment } from '../../../../../types/appointments';
-import { User } from '../../../../../types/auth';
+import { Appointment } from '../../../../types/appointments';
+import { User } from '../../../../types/auth';
 import {
   Container,
   DoctorImage,

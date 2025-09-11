@@ -1,11 +1,7 @@
 import React from 'react';
 import { Icon } from 'react-native-elements';
-import {
-  Container,
-  EmptyIcon,
-  Message,
-  SubMessage
-} from './styles';
+import {Container, EmptyIcon, Message, SubMessage} from '../../styles';
+import theme from '../../../../styles/theme';
 
 interface EmptyStateProps {
   icon: string;
@@ -23,7 +19,7 @@ const EmptyState: React.FC<EmptyStateProps> = ({
       <Icon 
         name={icon} 
         size={40} 
-        color={theme.colors.textSecondary}
+        color={theme.colors.secondary}
         type="material"
       />
     </EmptyIcon>
